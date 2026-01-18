@@ -11,11 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'KenCode Flutter Practice',
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'KenCode Flutter Practice'),
     );
   }
 }
@@ -48,11 +48,23 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: .center,
           children: [
-            const Text('You have pushed the button this many times:'),
+            const Text('ボタンを押した回数'),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            if (_counter >= 10)
+              const Text(
+                "おめでとう！10回達成",
+                style: TextStyle(color: Colors.green, fontSize: 10),
+              ),
+            const SizedBox(height: 20),
+
+            ElevatedButton(onPressed:() {
+              setState(() {
+                _counter = 0;
+              });
+            } , child: const Text("リセット"))
           ],
         ),
       ),
