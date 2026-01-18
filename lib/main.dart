@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'models/todo.dart';
+import 'api/todo_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,15 +32,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
-  List<String> todos = [];
-  void addTodo() {
+  Future<void> addTodo() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      todos.add(text);
+    try {
+      await createTodo(text);
       _controller.clear();
-    });
+      await loadTodos();
+    } catch (e) {
+      print("create error: $e");
+    }
   }
 
   Widget buildInputArea() {
@@ -62,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       itemCount: todos.length,
       itemBuilder: (context, index) {
         return ListTile(
-          title: Text(todos[index]),
+          title: Text(todos[index].title),
           trailing: IconButton(icon: const Icon(Icons.delete),
             onPressed: () {
               setState(() {
@@ -75,7 +79,32 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  List<Todo> todos = [];
+  bool isLoading = false;
+
+  Future<void> loadTodos() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final result = await fetchTodos();
+      setState(() {
+        todos = result;
+      });
+    } catch (e) {
+      print("API error: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
+  void initState() {
+    super.initState();
+    loadTodos();
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
