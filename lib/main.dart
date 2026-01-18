@@ -41,6 +41,40 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Widget buildInputArea() {
+    return Column(
+      children: [
+        TextField(
+          controller: _controller,
+          decoration: const InputDecoration(
+            labelText: "TODOを入力",
+            border: UnderlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: addTodo, child: const Text("追加")),
+      ]
+    );
+  }
+
+  Widget buildTodoList() {
+    return ListView.builder(
+      itemCount: todos.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(todos[index]),
+          trailing: IconButton(icon: const Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                todos.removeAt(index);
+              });
+            },
+          ),
+        );
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,35 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Padding(padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: "TODOを入力",
-                border: UnderlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(onPressed: addTodo, child: const Text("追加")),
+            buildInputArea(),
             const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: todos.length,
-                itemBuilder: (context, index){
-                  return ListTile(
-                    title: Text(todos[index]),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          todos.removeAt(index);
-                        });
-                      },
-                      ),
-                  );
-                },
-              )
-            )
-
+            Expanded(child: buildTodoList()),
           ],
         )
       )
