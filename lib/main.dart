@@ -29,11 +29,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final TextEditingController _controller = TextEditingController();
+  List<String> todos = [];
+  void addTodo() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
 
-  void _incrementCounter() {
     setState(() {
-      _counter++;
+      todos.add(text);
+      _controller.clear();
     });
   }
 
@@ -44,35 +48,42 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Padding(padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: .center,
           children: [
-            const Text('ボタンを押した回数'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            if (_counter >= 10)
-              const Text(
-                "おめでとう！10回達成",
-                style: TextStyle(color: Colors.green, fontSize: 10),
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                labelText: "TODOを入力",
+                border: UnderlineInputBorder(),
               ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: addTodo, child: const Text("追加")),
             const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: todos.length,
+                itemBuilder: (context, index){
+                  return ListTile(
+                    title: Text(todos[index]),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          todos.removeAt(index);
+                        });
+                      },
+                      ),
+                  );
+                },
+              )
+            )
 
-            ElevatedButton(onPressed:() {
-              setState(() {
-                _counter = 0;
-              });
-            } , child: const Text("リセット"))
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+        )
+      )
+      
     );
   }
 }
