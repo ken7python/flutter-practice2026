@@ -65,17 +65,75 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListView.builder(
       itemCount: todos.length,
       itemBuilder: (context, index) {
+        final todo = todos[index];
         return ListTile(
-          title: Text(todos[index].title),
-          trailing: IconButton(icon: const Icon(Icons.delete),
-            onPressed: () {
-              setState(() {
-                todos.removeAt(index);
-              });
-            },
+          title: Text(
+            todo.title,
+            style: TextStyle(
+              decoration: todo.completed ? TextDecoration.lineThrough : TextDecoration.none,
+            )  
           ),
+          leading: Checkbox(
+            value: todo.completed,
+            onChanged: (value) async {
+              if (value == null) return;
+
+              await updateCompleted(todo.id, value);
+              await loadTodos();
+            }
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  showEditDialog(todo);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  await deleteTodo(todo.id);
+                  await loadTodos();
+                }
+              )
+            ]
+          )
         );
       }
+    );
+  }
+
+  Future<void> showEditDialog(Todo todo) async {
+    final controller = TextEditingController(text: todo.title);
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("TODOを編集"),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            child: Text("キャンセル"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () async {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+
+              await updateTitle(todo.id, text);
+              await loadTodos();
+              Navigator.pop(context);
+            },
+          )
+        ]
+      )
     );
   }
 
