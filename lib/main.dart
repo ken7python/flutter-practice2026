@@ -86,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       isLoading = true;
     });
+    // await Future.delayed(const Duration(milliseconds: 1500));
     try {
       final result = await fetchTodos();
       setState(() {
@@ -116,7 +117,13 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             buildInputArea(),
             const SizedBox(height: 20),
-            Expanded(child: buildTodoList()),
+            Expanded(
+              child: isLoading
+              ? const Center(
+                child: CircularProgressIndicator()
+              )
+              : buildTodoList(),
+            ),
           ],
         )
       )
