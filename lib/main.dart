@@ -51,7 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
         TextField(
           controller: _controller,
           decoration: const InputDecoration(
-            labelText: "TODOを入力",
+            labelText: "TODO",
+            hintText: "やることを入力...",
             border: UnderlineInputBorder(),
           ),
         ),
@@ -62,46 +63,53 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildTodoList() {
-    return ListView.builder(
-      itemCount: todos.length,
-      itemBuilder: (context, index) {
-        final todo = todos[index];
-        return ListTile(
-          title: Text(
-            todo.title,
-            style: TextStyle(
-              decoration: todo.completed ? TextDecoration.lineThrough : TextDecoration.none,
-            )  
-          ),
-          leading: Checkbox(
-            value: todo.completed,
-            onChanged: (value) async {
-              if (value == null) return;
+    return RefreshIndicator(
+      onRefresh: loadTodos,
+      child: ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: (context, index) {
+          final todo = todos[index];
+          return ListTile(
+            title: Text(
+              todo.title,
+              style: TextStyle(
+                decoration: todo.completed
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
+                color: todo.completed ? Colors.grey : Colors.black,
+                fontStyle: todo.completed ? FontStyle.italic : FontStyle.normal,
+              )  
+            ),
+            leading: Checkbox(
+              value: todo.completed,
+              onChanged: (value) async {
+                if (value == null) return;
 
-              await updateCompleted(todo.id, value);
-              await loadTodos();
-            }
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  showEditDialog(todo);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () async {
-                  await deleteTodo(todo.id);
-                  await loadTodos();
-                }
-              )
-            ]
-          )
-        );
-      }
+                await updateCompleted(todo.id, value);
+                await loadTodos();
+              }
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    showEditDialog(todo);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () async {
+                    await deleteTodo(todo.id);
+                    await loadTodos();
+                  }
+                )
+              ]
+            )
+          );
+        }
+      )
     );
   }
 
