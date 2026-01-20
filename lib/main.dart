@@ -38,6 +38,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     try {
       await createTodo(text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("追加しました")),
+      );
       _controller.clear();
       await loadTodos();
     } catch (e) {
